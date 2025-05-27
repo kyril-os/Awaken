@@ -1,3 +1,6 @@
+
+export type prioritype = "high" | "medium" | "low";
+
 export interface task{
   id: number;
   title: string;
@@ -6,5 +9,5 @@ export interface task{
   dueDate?: Date | null;
   updatedAt: Date | null;
   completed: boolean;
-  priority: "high" | "medium" | "low";
+  priority: prioritype;
 }
