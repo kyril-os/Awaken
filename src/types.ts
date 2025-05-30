@@ -11,3 +11,10 @@ export interface task{
   completed: boolean;
   priority: prioritype;
 }
+
+
+export type NotificationType = "complete" | "delete"
+
+export type NotificationIcon = "check" | "xmark" | "none";
+
+export type NotificationPosition = "top-right" | "buttom";

@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { use, useContext, useState } from 'react'
 import type { prioritype, task } from './types';
 import TasksList from './components/TaskList';
 import TaskForm from './components/TaskForm';
-
+import Notification from './components/Notification'
+import NotificationContext from './context/NotificationContext';
 
 
 function App(){
@@ -51,6 +52,9 @@ function App(){
 
   ]);
 
+
+  const { notify } = useContext(NotificationContext);
+
   const addTask = (title: string, desc: string = '', dueDate: Date | null, priority: prioritype = "medium") => {
     const newTask: task = {
       id: new Date().getTime(),
@@ -63,12 +67,18 @@ function App(){
       updatedAt: null,
     } 
     setTasks([...tasks, newTask]);
+    notify('complete', 'Task Added Successfully', 'top-right', 'check');
+
   }
 
-
-
+  
   return(
     <>
+      <Notification 
+        // type="delete"
+        // message="Undo Delete?"
+        // position='buttom'
+      />
       <TaskForm 
         addTask={addTask}
       />
