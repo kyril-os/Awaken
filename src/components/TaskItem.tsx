@@ -40,11 +40,14 @@ const TaskItem = ({task, onDelete, onComplete}:props) => {
           </div>
           <div className="flex">
             <div className="flex text-white">
-              <XMarkIcon className="inline-block w-[22px] h-[22px] mr-1 ml-1 text-red-500 hover:cursor-pointer"
-                onClick={() => onDelete(task.id)}
+              <XMarkIcon className="inline-block w-[22px] h-[22px] mr-1 ml-1 text-red-500 hover:cursor-pointer hover:scale-120"
+                onClick={() => {
+                  console.log("from Item: ", task.id)
+                  onDelete(task.id)
+                }}
               />
-              <CheckIcon className="inline-block w-5 h-5 mr-1 ml-1 text-green-500 hover:cursor-pointer"
-                onClick={() => onComplete(task.id)}
+              <CheckIcon className={`inline-block w-5 h-5 mr-1 ml-1 ${task.completed ? "text-red-500" : "text-green-500"} hover:cursor-pointer hover:scale-120`}
+                onClick={() => onComplete(task.id, task.completed)}
               />
 
             </div>
