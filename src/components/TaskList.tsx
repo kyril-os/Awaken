@@ -2,6 +2,8 @@ import React, { useContext, useState } from "react";
 import type { task } from "../types";
 import TaskItem from "./TaskItem";
 import NotificationContext from "../context/NotificationContext";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import Collapsible from "./Collapsible";
 
 type props = {
   tasks: task[];
@@ -47,17 +49,45 @@ const TasksList = ({tasks, setTasks}: props) => {
     );
   }
 
+  const [showCompleted, setShowCompleted] = useState<boolean>(true);
+  const [showActive, setShowActive] = useState<boolean>(true);
 
   return(
     <>
-      {tasks.map(task =>
-        <TaskItem
-          key={task.id}
-          task={task}
-          onComplete={onComplete}
-          onDelete={onDelete}
-        />
-      )}
+      <div  className="flex gap-2 font-semibold hover:cursor-pointer"
+        onClick={() => setShowActive(!showActive)}
+      >
+        <ChevronDownIcon className="h-6 w-6"/>
+        <span>Active</span>
+      </div>
+      <Collapsible isOpen={showActive}>
+        {tasks.map(task => !task.completed?
+          <TaskItem
+            key={task.id}
+            task={task}
+            onComplete={onComplete}
+            onDelete={onDelete}
+          />
+          : null
+        )}
+      </Collapsible>
+      <div className="flex gap-2 font-semibold hover:cursor-pointer"
+        onClick={() => setShowCompleted(!showCompleted)}
+      >
+        <ChevronDownIcon className="h-6 w-6"/>
+        <span>Completed</span>
+      </div>
+      <Collapsible isOpen={showCompleted}>
+        {tasks.map(task => task.completed?
+          <TaskItem
+            key={task.id}
+            task={task}
+            onComplete={onComplete}
+            onDelete={onDelete}
+          />
+          : null
+        )}
+      </Collapsible>
     </>
   )
 }

@@ -1,4 +1,4 @@
-import { use, useContext, useState } from 'react'
+import { useContext, useState } from 'react'
 import type { prioritype, task } from './types';
 import TasksList from './components/TaskList';
 import TaskForm from './components/TaskForm';
@@ -71,7 +71,7 @@ function App(){
 
   }
 
-  
+
   return(
     <>
       <Notification 

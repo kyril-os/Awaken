@@ -4,6 +4,7 @@ import type { task } from "../types";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
 import { CheckIcon } from "@heroicons/react/16/solid";
 import { XMarkIcon } from "@heroicons/react/16/solid";
+import Collapsible from "./Collapsible";
 
 type props = {
   // title: string;
@@ -32,7 +33,7 @@ const TaskItem = ({task, onDelete, onComplete}:props) => {
 
   return(
     <>
-      <div className="bg-gray-700 p-3 m-2 mb-4">
+      <div className="bg-gray-700 p-3 m-2 mb-4 rounded-xl">
         <div className="flex items-center justify-between" >
           <div>
             <span className={`inline-block h-3 w-3 mr-2 rounded-full shadow shadow-black ${colors[task.priority]}`}/>
@@ -55,16 +56,17 @@ const TaskItem = ({task, onDelete, onComplete}:props) => {
             <div className="flex items-center">
               <div className="h-5 w-[1px] mr-2 ml-2 bg-gray-300"/>
               <ChevronDownIcon className="inline-block w-5 h-5 hover:cursor-pointer hover:scale-120" 
-                onClick={() => setShowDesc(!showDesc)}/>
+                onClick={() => setShowDesc(!showDesc)}
+              />
             </div>}
           </div>
         </div>
         {task.description &&
-          (<div className={`${showDesc ? "flex" : "hidden"} mt-3`}>
-            <hr />
-            <p className="text-xs">{task.description}</p>
-          </div>)
-          }
+          (<Collapsible isOpen={showDesc} className="mt-3">
+            <hr className="text-white rounded-2xl border-1 opacity-20"/>
+            <p className="text-xs mt-2.5 ml-4">{task.description}</p>
+          </Collapsible>)
+        }
       </div>
     </>
   )
