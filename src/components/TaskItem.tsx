@@ -55,9 +55,9 @@ const TaskItem = ({task, onDelete, onComplete}:props) => {
             {task.description && 
             <div className="flex items-center">
               <div className="h-5 w-[1px] mr-2 ml-2 bg-gray-300"/>
-              <ChevronDownIcon className="inline-block w-5 h-5 hover:cursor-pointer hover:scale-120" 
-                onClick={() => setShowDesc(!showDesc)}
-              />
+              <ChevronDownIcon className={`inline-block w-5 h-5 hover:cursor-pointer hover:scale-120 transition-transform duration-300 ${showDesc ? "" : "rotate-90"} `} 
+                  onClick={() => setShowDesc(!showDesc)}
+                />
             </div>}
           </div>
         </div>

@@ -1,13 +1,16 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PlusIcon } from "@heroicons/react/20/solid";
 import type { prioritype } from "../types";
+import { useHotkeys } from "react-hotkeys-hook";
 
 
 
 const TaskForm = ({addTask}: {addTask: Function}) => {
 
-  const [showForm, setShowForm] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+  const titleRef = useRef<HTMLInputElement>(null);
 
+  const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState<string>('');
   const [desc, setDesc] = useState<string>('');
   const [priority, setPriority] = useState<prioritype>("low");
@@ -20,7 +23,31 @@ const TaskForm = ({addTask}: {addTask: Function}) => {
     setDueDate(undefined);
   }
 
+  //// KEYBOARD SHORTCUTS ////
+  // New Task
+  useHotkeys('ctrl+enter', () => {
+    setShowForm(true);
+  })
+  // Add Task
+  useHotkeys('ctrl+enter', () => {
+    formRef.current?.requestSubmit();
+  }, {
+    enableOnFormTags: ["TEXTAREA", 'INPUT', "select"],
+    enabled: showForm,
+  }) 
+  // Exit Form
+  useHotkeys('esc', () => {
+    setShowForm(false);
+  }, {
+    enabled: showForm,
+    enableOnFormTags: ["INPUT", "TEXTAREA", "select"]
+  })
 
+  useEffect(() => {
+    if(showForm)
+      titleRef.current?.focus();
+  }, [showForm])
+  
 
   return(
     <>
@@ -32,7 +59,7 @@ const TaskForm = ({addTask}: {addTask: Function}) => {
       </button>
        
       {showForm && 
-      <form 
+      <form ref={formRef}
         className="flex fixed flex-col gap-11 items-center bg-gray-700 w-[90%] p-5 pt-15 pb-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border-2 border-black drop-shadow-2xl dropshadow-white rounded-2xl"
         onSubmit={(e) => {
           e.preventDefault();
@@ -43,7 +70,7 @@ const TaskForm = ({addTask}: {addTask: Function}) => {
       >
         <div className="flex h-9 w-[90%] justify-between items-center">
           <label htmlFor="title">Title: </label>
-          <input value={title} onChange={e => setTitle(e.target.value)} id="title" name="title" type="text" className="w-[80%] bg-gray-900 rounded-2xl p-1 px-5 focus:border-white focus:ring-0 focus:outline-none" required></input>
+          <input ref={titleRef} value={title} onChange={e => setTitle(e.target.value)} id="title" name="title" type="text" className="w-[80%] bg-gray-900 rounded-2xl p-1 px-5 focus:border-white focus:ring-0 focus:outline-none" required></input>
         </div>
         <div className="flex h-9 w-[90%] justify-between items-center">
           <label htmlFor="desc">Description: </label>

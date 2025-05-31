@@ -7,7 +7,7 @@ export interface task{
   description: string;
   createdAt: Date;
   dueDate?: Date | null;
-  updatedAt: Date | null;
+  updatedAt?: Date | null;
   completed: boolean;
   priority: prioritype;
 }

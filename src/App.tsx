@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import type { prioritype, task } from './types';
 import TasksList from './components/TaskList';
 import TaskForm from './components/TaskForm';
@@ -8,52 +8,17 @@ import NotificationContext from './context/NotificationContext';
 
 function App(){
 
-  const [tasks, setTasks] = useState<task[]>([
-    {
-      id: new Date().getTime(),
-      title: "Test",
-      description: "This is a test to see if anything is working",
-      createdAt: new Date(2025, 2, 14),
-      completed: true,
-      priority: "low",
-      dueDate: null,
-      updatedAt: null
-    },
-    {
-      id: new Date(2025, 1, 15).getTime(),
-      title: "Test",
-      description: "This is a test to see if anything is working",
-      createdAt: new Date(),
-      completed: false,
-      priority: "high",
-      dueDate: null,
-      updatedAt: null
-    },
-    {
-      id: new Date(2021, 12, 23).getTime(),
-      title: "Test",
-      description: "This is a test to see if anything is working",
-      createdAt: new Date(),
-      completed: false,
-      priority: "medium",
-      dueDate: null,
-      updatedAt: null
-    },
-    {
-      id: new Date(2023, 5, 23).getTime(),
-      title: "Test",
-      description: "This is a test to see if anything is working",
-      createdAt: new Date(),
-      completed: false,
-      priority: "high",
-      dueDate: null,
-      updatedAt: null
-    },
-
-  ]);
+  const [tasks, setTasks] = useState<task[]>(() => {
+    const saved = localStorage.getItem('tasks');
+    return saved ? JSON.parse(saved) : [];
+  });
 
 
   const { notify } = useContext(NotificationContext);
+
+  useEffect(() => {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+  }, [tasks])
 
   const addTask = (title: string, desc: string = '', dueDate: Date | null, priority: prioritype = "medium") => {
     const newTask: task = {
