@@ -2,6 +2,7 @@ import { PlusIcon } from "@heroicons/react/24/solid";
 import type { List } from "../types"
 import TasksList from "./TasksList";
 import useStore from "../Store";
+import { useState } from "react";
 // import { EllipsisVerticalIcon } from "@heroicons/react/24/solid";
 
 
@@ -10,9 +11,12 @@ const ListsContainer = ({container}:{container: List[]}) => {
 
   const addList = useStore(state => state.addList)
 
+  const [newListId, setNewlistId] = useState<number | null>(null)
   const handleAddList = () => {
-    addList("");
+    const newId = addList("");
+    setNewlistId(newId);
   }
+  
 
   return(
     <div className="pl-1 flex flex-1 gap-5 py-4 w-full h-1/2 justify-start overflow-x-scroll">
@@ -20,7 +24,7 @@ const ListsContainer = ({container}:{container: List[]}) => {
         .filter(list => list !== null)
         .map((list) => 
           <div className="min-w-70" key={list.id}>
-            <TasksList list={list}/>
+            <TasksList list={list} isNewlyAdded={list.id === newListId}/>
           </div>
         )
       }

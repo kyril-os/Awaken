@@ -29,7 +29,8 @@ const TaskItem = ({task, listId}:props) => {
   }
 
   const handleComplete = () => {
-    updateTask(listId, task.id, {completed: !task.completed})
+    if(task.title)
+      updateTask(listId, task.id, {completed: !task.completed})
   }
 
   const handleSave = () => {

@@ -10,7 +10,7 @@ interface Store {
 
   dailyLists: List[];
   customLists: List[];
-  addList: (title: string) => void;
+  addList: (title: string) => number;
   deleteList: (listId: number) => void;
   updateList: (listId: number, updatedFields: Partial<List>) => void;
   addTask: (listId: number, title: string) => void;
@@ -63,10 +63,10 @@ const useStore = create(persist<Store>(
       get().listIndexIncrement();
 
       set((state) => ({
-        customLists: [...state.customLists, list]
+        customLists: [list, ...state.customLists]
       }));
 
-
+      return list.id;
 
     },
     
