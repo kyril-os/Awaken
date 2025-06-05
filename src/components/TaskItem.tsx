@@ -43,7 +43,6 @@ const TaskItem = ({task, listId}:props) => {
       handleSave();
     }
     else if (e.key === "Escape") {
-      e.preventDefault();
       setTitle(task.title);
       setIsEditing(false);
     }
@@ -54,6 +53,7 @@ const TaskItem = ({task, listId}:props) => {
     "high": "bg-red-500",
     "medium": "bg-yellow-500",
     "low": "bg-green-500",
+    "undefined": "transparent"
   }
 
 
@@ -63,23 +63,23 @@ const TaskItem = ({task, listId}:props) => {
   return(
     <div onClick={handleComplete}
       className={`group flex items-center gap-2 w-full px-2 ${task.completed ? "line-through" : ""} hover:bg-[#ffffff10]`} >
-      <span className={`h-3 w-3 rounded-full flex-shrink-0 ${colors[task.priority]}`} />
-        {isEditing ? 
-          <input className="flex-grow outline-none bg-transparent border-none" value={title}
-            autoFocus 
-            onChange={(e) => setTitle(e.target.value)}
-            onBlur={handleSave}
-            onKeyDown={handleKeyDown}
-            />
-          :
-          <span className="flex-grow outline-none"
-            onDoubleClick={(e) => {
-              e.stopPropagation();
-              setIsEditing(true);
-          }}>
-            {task.title}
-          </span>
-        }
+      <span className={`h-3 w-3 rounded-full flex-shrink-0 ${colors[task.priority]} ${task.title? "border-[1px] border-[#ffffff50]" : ""}`} />
+      {isEditing ? 
+        <input className="flex-grow outline-none bg-transparent border-none truncate" value={title}
+          autoFocus 
+          onChange={(e) => setTitle(e.target.value)}
+          onBlur={handleSave}
+          onKeyDown={handleKeyDown}
+          />
+        :
+        <span className="flex-grow outline-none truncate"
+          onDoubleClick={(e) => {
+            e.stopPropagation();
+            setIsEditing(true);
+        }}>
+          {task.title.trim() === "" ? '\u200B' : task.title}
+        </span>
+      }
       <span className="flex-shrink-0 hidden group-hover:flex justify-evenly gap-1 ">
         <EllipsisHorizontalIcon className="w-5 h-5 hover:cursor-pointer"/>
         <XMarkIcon onClick={handleDelete} 

@@ -27,4 +27,4 @@ export interface SubTask {
 }
 
 
-export type prioritype = "high" | "medium" | "low";
+export type prioritype = "high" | "medium" | "low" | "undefined";
