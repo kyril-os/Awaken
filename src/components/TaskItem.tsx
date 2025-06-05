@@ -2,8 +2,7 @@ import { EllipsisHorizontalIcon } from "@heroicons/react/24/solid";
 import type { Task } from "../types";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import useStore  from "../Store";
-import { useState } from "react";
-import { parseAst } from "vite";
+import React, { useState } from "react";
 
 
 
@@ -33,6 +32,23 @@ const TaskItem = ({task, listId}:props) => {
     updateTask(listId, task.id, {completed: !task.completed})
   }
 
+  const handleSave = () => {
+    updateTask(listId, task.id, {title: title})
+    setIsEditing(false);
+  }
+
+  const handleKeyDown = (e:React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSave();
+    }
+    else if (e.key === "Escape") {
+      e.preventDefault();
+      setTitle(task.title);
+      setIsEditing(false);
+    }
+  }
+
 
   const colors = {
     "high": "bg-red-500",
@@ -45,25 +61,25 @@ const TaskItem = ({task, listId}:props) => {
 
 
   return(
-    <div className={`group flex items-center gap-2 w-full px-2 ${task.completed ? "line-through" : ""} hover:bg-[#ffffff10]`} >
+    <div onClick={handleComplete}
+      className={`group flex items-center gap-2 w-full px-2 ${task.completed ? "line-through" : ""} hover:bg-[#ffffff10]`} >
       <span className={`h-3 w-3 rounded-full flex-shrink-0 ${colors[task.priority]}`} />
-      {/* { onEditing ?
-        <input className="flex-grow outline-none max-w-[70%]" value={title} 
-        onChange={(e) => {
-          setTitle(e.target.value)
-          updateTask(listId, task.id, {title: e.target.value})
-        }}/>
-        : */}
-      <span className="flex-grow outline-none" contentEditable={isEditing}
-        onDoubleClick={() => setIsEditing(true)}
-        onBlur={() => updateTask(listId, task.id, { title })}
-        onKeyDown={(e) => {if(e.key === "Enter"){
-          e.preventDefault()
-          updateTask(listId, task.id, { title })
-        }}} 
-        onClick={() => handleComplete()}
-      >{task.title}</span>
-      {/* } */}
+        {isEditing ? 
+          <input className="flex-grow outline-none bg-transparent border-none" value={title}
+            autoFocus 
+            onChange={(e) => setTitle(e.target.value)}
+            onBlur={handleSave}
+            onKeyDown={handleKeyDown}
+            />
+          :
+          <span className="flex-grow outline-none"
+            onDoubleClick={(e) => {
+              e.stopPropagation();
+              setIsEditing(true);
+          }}>
+            {task.title}
+          </span>
+        }
       <span className="flex-shrink-0 hidden group-hover:flex justify-evenly gap-1 ">
         <EllipsisHorizontalIcon className="w-5 h-5 hover:cursor-pointer"/>
         <XMarkIcon onClick={handleDelete} 
