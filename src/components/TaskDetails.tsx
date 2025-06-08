@@ -1,7 +1,7 @@
 import { CalendarDateRangeIcon, PlusIcon, XMarkIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { type Task } from "../types";
 import useStore from "../Store";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 
 type props = {
@@ -21,15 +21,15 @@ const TaskDetails = ({task, listId}:props) => {
   const [tempTask, setTempTask] = useState<Task>(task)
 
 
-  const saveTask = () => {
+  const saveTask = useCallback(() => {
     updateTask(listId, task.id, tempTask);
     setSelectedTaskDetailsId(null);
-  }
+  }, [tempTask])
 
-  const discardTask = () => {
+  const discardTask = useCallback(() => {
     setTempTask(task);
     setSelectedTaskDetailsId(null);
-  }
+  }, [task])
 
 
   useEffect(() => {
@@ -45,7 +45,7 @@ const TaskDetails = ({task, listId}:props) => {
     document.addEventListener('keydown', handleKeyDown);
 
     return () => document.removeEventListener('keydown', handleKeyDown);
-  },[tempTask])
+  },[saveTask, discardTask])
 
   const updateSubTask = (key: "title" | "completed", value: string | boolean, id:number) => {
     setTempTask(current => ({...current,
