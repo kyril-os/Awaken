@@ -1,13 +1,11 @@
 import { H1Icon } from "@heroicons/react/16/solid";
 import { CalendarIcon, ChartBarIcon, Cog8ToothIcon, HomeIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
-// import { useState } from "react";
 
 
 
 
 const SideBar = () => {
 
-  // const [isFormVisible, setIsFormVisible] = useState(false)
 
   const handleAddList = () => {
 

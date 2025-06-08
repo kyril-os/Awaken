@@ -16,6 +16,8 @@ interface Store {
   addTask: (listId: number, title: string) => void;
   deleteTask: (listId: number, taskId: number) => void;
   updateTask: (listId: number, taskId: number, updatedFields: Partial<Task>) => void;
+  selectedTaskDetailsId: number | null;
+  setSelectedTaskDetailsId: (id: number | null) => void;
 }
 
 
@@ -24,14 +26,21 @@ const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Fri
 const defaultDailyLists: List[] = daysOfWeek.map((day,index) => ({
   id: index + 1,
   title: day,
-  tasks: []
-  // tasks: [{
-  //   id: 1,
-  //   title: "this is a test",
-  //   completed: false,
-  //   priority: "high",
-  //   updatedAt: new Date()
-  // }],
+  // tasks: []
+  tasks: [{
+    id: Math.floor(Math.random() * 1000000000),
+    title: "this is a test",
+    completed: false,
+    priority: "high",
+    updatedAt: new Date(),
+    subtasks: [
+      {
+        id: Math.floor(Math.random() * 10000000),
+        title: "this is a subtask",
+        completed: Math.random() < 0.5,
+      }
+    ]
+  }],
 }))
 
 
@@ -125,6 +134,17 @@ const useStore = create(persist<Store>(
           )
 
         })),
+
+
+
+
+        
+        selectedTaskDetailsId: null,
+
+        setSelectedTaskDetailsId: (id) => 
+          set(() => ({
+            selectedTaskDetailsId: id
+          })),
     
   }),
   {

@@ -67,7 +67,7 @@ const TaskList = ({list, isNewlyAdded}:props) => {
             onKeyDown={handleKeyDown}
           /> 
         : 
-          <div className={`group flex-grow p-2 truncate font-bold text-2xl justify-center flex mx-2 items-center h-8 ${list.id <= 7 ? "hover:cursor-default select-none" : "hover:cursor-text"}`}
+          <div className={`group flex-grow p-2 truncate font-bold text-2xl justify-center flex mx-2 items-center h-8 hover:cursor-default select-none`}
             onDoubleClick={() => setIsBeingEdited(true)}
           >
             {list.title.trim() === "" ? '\u200B' : list.title }
