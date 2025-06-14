@@ -12,19 +12,33 @@ const ListsContainer = ({container}:{container: List[]}) => {
   const addList = useStore(state => state.addList)
 
   const [newListId, setNewlistId] = useState<number | null>(null)
+  
   const handleAddList = () => {
     const newId = addList("");
     setNewlistId(newId);
   }
-  
 
+  const dailyLists = useStore(state => state.dailyLists);
+  const customLists = useStore(state => state.customLists);
+
+  const minTasks = 8;
+
+  const maxDailyTasks = Math.max(...dailyLists.map(list => list.tasks.length),minTasks);
+  const maxCustomTasks = Math.max(...customLists.map(list => list.tasks.length),minTasks);
+
+  const [focusId, setFocusId] = useState<number | null>(null);
+
+
+  
   return(
     <div className="pl-1 flex flex-1 gap-5 py-4 w-full h-1/2 justify-start overflow-x-scroll">
       {container
-        .filter(list => list !== null)
+        // .filter(list => list !== null)
         .map((list) => 
           <div className="min-w-70" key={list.id}>
-            <TasksList list={list} isNewlyAdded={list.id === newListId}/>
+            <TasksList list={list} isNewlyAdded={list.id === newListId} totalTasks={list.id > 7 ? maxCustomTasks : maxDailyTasks}
+              focusId={focusId} setFocusId={setFocusId}  
+            />
           </div>
         )
       }

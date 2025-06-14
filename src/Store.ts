@@ -10,7 +10,7 @@ interface Store {
 
   dailyLists: List[];
   customLists: List[];
-  addList: (title: string) => number;
+  addList: (title: string, isNewlyAdded?: boolean) => number;
   deleteList: (listId: number) => void;
   updateList: (listId: number, updatedFields: Partial<List>) => void;
   addTask: (listId: number, title: string) => void;
@@ -61,12 +61,20 @@ const useStore = create(persist<Store>(
     dailyLists: defaultDailyLists,
     customLists: [],
 
-    addList: (title) =>{
+    addList: (title, isNewlyAdded) =>{
       
+      const theTasks: Task[] = isNewlyAdded ? [{
+        id: -1,
+        title: "__TRIGGER_FOCUS()__",
+        completed: false,
+        priority: "undefined",
+        updatedAt: new Date()
+      }] : []
+
       const list = {
         id: get().listIdIndex,
         title: title,
-        tasks: []
+        tasks: theTasks,
       };
 
       get().listIndexIncrement();

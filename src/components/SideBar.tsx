@@ -1,5 +1,6 @@
 import { H1Icon } from "@heroicons/react/16/solid";
 import { CalendarIcon, ChartBarIcon, Cog8ToothIcon, HomeIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
+import useStore from "../Store";
 
 
 
@@ -7,8 +8,10 @@ import { CalendarIcon, ChartBarIcon, Cog8ToothIcon, HomeIcon, InformationCircleI
 const SideBar = () => {
 
 
-  const handleAddList = () => {
+  const addList = useStore(state => state.addList);
 
+  const handleAddList = () => {
+    addList('', true);
   }
 
   return(
