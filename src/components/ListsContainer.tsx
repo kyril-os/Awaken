@@ -26,7 +26,7 @@ const ListsContainer = ({container}:{container: List[]}) => {
   const maxDailyTasks = Math.max(...dailyLists.map(list => list.tasks.length),minTasks);
   const maxCustomTasks = Math.max(...customLists.map(list => list.tasks.length),minTasks);
 
-  const [focusId, setFocusId] = useState<number | null>(null);
+  // const [focusId, setFocusId] = useState<number | null>(null);
 
 
   
@@ -37,7 +37,7 @@ const ListsContainer = ({container}:{container: List[]}) => {
         .map((list) => 
           <div className="min-w-70" key={list.id}>
             <TasksList list={list} isNewlyAdded={list.id === newListId} totalTasks={list.id > 7 ? maxCustomTasks : maxDailyTasks}
-              focusId={focusId} setFocusId={setFocusId}  
+              // focusId={focusId} setFocusId={setFocusId}  
             />
           </div>
         )

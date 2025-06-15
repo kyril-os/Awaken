@@ -11,30 +11,59 @@ type props = {
   list: List,
   isNewlyAdded: boolean,
   totalTasks: number,
-  setFocusId: React.Dispatch<React.SetStateAction<number | null>>,
-  focusId: number | null
+  // setFocusId: React.Dispatch<React.SetStateAction<number | null>>,
+  // focusId: number | null
 }
 
 
-const TaskList = ({list, isNewlyAdded, totalTasks, focusId, setFocusId}:props) => {
+const TaskList = ({list, isNewlyAdded, totalTasks/*, focusId, setFocusId*/}:props) => {
 
   const addTask = useStore(state => state.addTask)
   const deleteTask = useStore(state => state.deleteTask)
 
   const lastTask = list.tasks[list.tasks.length - 1]
-  useEffect(() => {
 
-    if(list.tasks.length < totalTasks || lastTask.title.trim()){
-      addTask(list.id, '');
+  const taskToEdit = list.tasks.find(task => !task.title.trim());
+
+
+  useEffect(() => {
+    if(list.tasks.length < totalTasks){
+      addTask(list.id, ''); 
+    }
+    // I don't Remember Why This Was Even Here, WTF was it Doing?
+    // I do now remember the purpose of this, it was to resmove empty tasks when there are too many of them without reason
+    else if(list.tasks.length > 8 && !list.tasks[list.tasks.length - 2].title.trim()){
+      deleteTask(list.id, list.tasks[list.tasks.length - 2].id);
+    }
+
+    if(lastTask && lastTask.title.trim()){
+      // const newId = addTask(list.id, '');
+      // taskToEdit = list.tasks.find(task => task.id === newId)
+      // addTask(list.id, '');
+      // setTriggerEffect(prev => prev + 1);
+      const newId = addTask(list.id, '');
+      setTimeout(() => setEditableTaskId(newId), 10)
       setTriggerEffect(prev => prev + 1);
     }
-    
-    // I don't Remember Why This Was Even Here, WTF was it Doing?
-    // else if(list.tasks.length > 8 && !list.tasks[list.tasks.length - 1].title.trim()){
-    //   deleteTask(list.id, list.tasks[list.tasks.length - 1].id);
-    // }
   }, [totalTasks, lastTask])
 
+  // useEffect(() => {
+  //   if(lastTask && lastTask.title.trim()){
+  //     console.log("this is triggering")
+  //     const newId = addTask(list.id, '');
+  //     setEditableTaskId(newId);
+  //   }
+  // }, [lastTask])
+
+
+
+  const [editableTaskId, setEditableTaskId] = useState<number | null>(null)
+
+  // if (lastTask && lastTask.title.trim()) {
+  //   const newId = addTask(list.id, '');
+  //   setEditableTaskId(newId);
+  // }
+  
 
 
   const [isBeingEdited, setIsBeingEdited] = useState<boolean>(false);
@@ -44,7 +73,7 @@ const TaskList = ({list, isNewlyAdded, totalTasks, focusId, setFocusId}:props) =
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    if(!isNewlyAdded && list.tasks[0].title === "__TRIGGER_FOCUS()__"){
+    if(!isNewlyAdded && list.tasks[0].id === -1){
       isNewlyAdded = true;
       deleteTask(list.id, -1)
     }
@@ -75,20 +104,17 @@ const TaskList = ({list, isNewlyAdded, totalTasks, focusId, setFocusId}:props) =
 
   const taskToEditInputRef = useRef<HTMLInputElement | null>(null);
 
-  const taskToEdit = list.tasks.find(task => !task.title.trim());
 
-
-  const [editableTaskId, setEditableTaskId] = useState<number | null>(null)
 
   const handleAddTask = () => {
     setEditableTaskId(taskToEdit?.id ?? null);
-    // if(list.id === focusId && list.title.trim())
-    //   taskToEditInputRef.current?.focus();
+    if(/*list.id === focusId && k*/list.title.trim())
+      taskToEditInputRef.current?.focus();
     // Make The Chosen Task Editable
 
   }
 
-
+  
   
   
 
@@ -169,13 +195,11 @@ const TaskList = ({list, isNewlyAdded, totalTasks, focusId, setFocusId}:props) =
     </Menu.Root>
   )
 
-  const dummyRef = useRef(null); // Always called
+  // const dummyRef = useRef(null); // Always called
 
 
   return(
     <div className="relative flex flex-col gap-2 justify-center"
-      // onClick={() => setFocusId(list.id)}
-      // onBlur={() => setFocusId(null)}
     >
       <div className="relative group flex flex-row items-center gap-1 justify-center">
         {isBeingEdited && list.id > 7 ? 
@@ -200,8 +224,9 @@ const TaskList = ({list, isNewlyAdded, totalTasks, focusId, setFocusId}:props) =
       <div className="flex flex-col gap-1">
         {list.tasks.map((task) => 
         <div key={task.id} className="flex flex-col gap-1 ">
-          <TaskItem task={task} listId={list.id} nestedRef={taskToEdit && task.id === taskToEdit.id ? taskToEditInputRef : dummyRef} handleAddTask={handleAddTask}
+          <TaskItem task={task} listId={list.id}  handleAddTask={handleAddTask}
             editableTaskId={editableTaskId} setEditableTaskId={setEditableTaskId}  setTriggerEffect={setTriggerEffect} /*setEditingTaskId={setEditingTaskId}*/
+            // nestedRef={taskToEdit && task.id === taskToEdit.id ? taskToEditInputRef : dummyRef}
           />
           <hr className="opacity-30"/>
         </div>)}

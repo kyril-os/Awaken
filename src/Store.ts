@@ -13,7 +13,7 @@ interface Store {
   addList: (title: string, isNewlyAdded?: boolean) => number;
   deleteList: (listId: number) => void;
   updateList: (listId: number, updatedFields: Partial<List>) => void;
-  addTask: (listId: number, title: string) => void;
+  addTask: (listId: number, title: string) => number;
   deleteTask: (listId: number, taskId: number) => void;
   updateTask: (listId: number, taskId: number, updatedFields: Partial<Task>) => void;
   selectedTaskDetailsId: number | null;
@@ -65,7 +65,7 @@ const useStore = create(persist<Store>(
       
       const theTasks: Task[] = isNewlyAdded ? [{
         id: -1,
-        title: "__TRIGGER_FOCUS()__",
+        title: '',
         completed: false,
         priority: "undefined",
         updatedAt: new Date()
@@ -119,6 +119,8 @@ const useStore = create(persist<Store>(
             list.id === listId ? {...list, tasks: [...list.tasks, task]} 
             : list ) 
       }))
+
+      return task.id;
     },
 
     deleteTask: (listId, taskId) => 

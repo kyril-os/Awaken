@@ -11,7 +11,7 @@ import TaskDetails from "./TaskDetails";
 type props = {
   listId: number,
   task: Task,
-  nestedRef: React.Ref<HTMLInputElement>,
+  // nestedRef: React.Ref<HTMLInputElement>,
   handleAddTask: Function,
   editableTaskId: number | null,
   setEditableTaskId: React.Dispatch<React.SetStateAction<number | null>>,
@@ -19,7 +19,7 @@ type props = {
 }
 
 
-const TaskItem = ({task, listId, nestedRef, editableTaskId, setEditableTaskId, handleAddTask, setTriggerEffect}:props) => {
+const TaskItem = ({task, listId/*, nestedRef*/, editableTaskId, setEditableTaskId, handleAddTask, setTriggerEffect}:props) => {
 
 
 
@@ -28,9 +28,9 @@ const TaskItem = ({task, listId, nestedRef, editableTaskId, setEditableTaskId, h
   const deleteTask = useStore(state => state.deleteTask);
   const updateTask = useStore(state => state.updateTask);
 
+  // const isEditing = task.id === editableTaskId;
 
   const [isEditing, setIsEditing] = useState<boolean>(task.id === editableTaskId)
-  
   useEffect(() => {
     setIsEditing(task.id === editableTaskId);
   }, [editableTaskId])
@@ -102,11 +102,11 @@ const TaskItem = ({task, listId, nestedRef, editableTaskId, setEditableTaskId, h
         <span className={`h-3 w-3 rounded-full flex-shrink-0 ${colors[task.priority]} ${task.title? "border-[1px] border-[#ffffff50]" : ""}`} />
         {isEditing ?
           <input className="flex-grow outline-none bg-transparent border-none truncate" value={title}
-            autoFocus 
+            autoFocus
             onChange={(e) => setTitle(e.target.value)}
             onBlur={handleSave}
             onKeyDown={handleKeyDown}
-            ref={nestedRef}
+            // ref={nestedRef}
             />
           :
           <span className="flex-grow outline-none truncate"
