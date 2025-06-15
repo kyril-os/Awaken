@@ -34,11 +34,11 @@ const TaskDetails = ({task, listId}:props) => {
 
   useEffect(() => {
     const handleKeyDown = (e:KeyboardEvent) => {
-      if (e.key === "Enter" && e.ctrlKey){
+      if (e.key === "Enter" && e.ctrlKey || e.key == "Escape" && !e.ctrlKey){
         e.preventDefault()
         saveTask();
       }
-      else if (e.key === "Escape")
+      else if (e.key === "Escape" && e.ctrlKey)
         discardTask();
     };
 

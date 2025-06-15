@@ -4,6 +4,8 @@ import { XMarkIcon } from "@heroicons/react/24/solid";
 import useStore  from "../Store";
 import React, { useEffect, useState } from "react";
 import TaskDetails from "./TaskDetails";
+import { useDraggable } from "@dnd-kit/core";
+import { useRef } from "react";
 
 
 
@@ -11,7 +13,6 @@ import TaskDetails from "./TaskDetails";
 type props = {
   listId: number,
   task: Task,
-  // nestedRef: React.Ref<HTMLInputElement>,
   handleAddTask: Function,
   editableTaskId: number | null,
   setEditableTaskId: React.Dispatch<React.SetStateAction<number | null>>,
@@ -19,7 +20,7 @@ type props = {
 }
 
 
-const TaskItem = ({task, listId/*, nestedRef*/, editableTaskId, setEditableTaskId, handleAddTask, setTriggerEffect}:props) => {
+const TaskItem = ({task, listId, editableTaskId, setEditableTaskId, handleAddTask, setTriggerEffect}:props) => {
 
 
 
@@ -27,8 +28,6 @@ const TaskItem = ({task, listId/*, nestedRef*/, editableTaskId, setEditableTaskI
 
   const deleteTask = useStore(state => state.deleteTask);
   const updateTask = useStore(state => state.updateTask);
-
-  // const isEditing = task.id === editableTaskId;
 
   const [isEditing, setIsEditing] = useState<boolean>(task.id === editableTaskId)
   useEffect(() => {
@@ -83,23 +82,41 @@ const TaskItem = ({task, listId/*, nestedRef*/, editableTaskId, setEditableTaskI
   const selectedTaskDetailsId = useStore((state) => state.selectedTaskDetailsId)
   const setSelectedTaskDetailsId = useStore((state) => state.setSelectedTaskDetailsId)
 
-  
+  const {attributes, listeners, setNodeRef, transform} = useDraggable({
+    id: task.id,
+  })
+
+  const styleDnD = transform ? {
+    transform: `translate(${transform.x}px, ${transform.y}px)`
+  } : undefined;
+
+  const empty: boolean = task.title || task.description || task.subtasks ? false : true 
+  const dummyRef = useRef(null);
+
   return(
     <>
       {task.id === selectedTaskDetailsId &&
         <TaskDetails task={task} listId={listId}
         />
       }
-      <div onDoubleClick={(e) => {
-              e.stopPropagation();
-              if (task.title)
-                setIsEditing(true);
-              else{
-                handleAddTask();
-              }
-          }}
-        className={`group flex items-center gap-2 w-full px-2 ${task.completed ? "line-through" : ""} ${task.title.trim() ? "hover:bg-white/10" : ''}`} >
-        <span className={`h-3 w-3 rounded-full flex-shrink-0 ${colors[task.priority]} ${task.title? "border-[1px] border-[#ffffff50]" : ""}`} />
+      <div className={`group flex items-center gap-2 w-full px-2 ${task.completed ? "line-through" : ""} ${task.title.trim() ? "hover:bg-white/10" : ''}`}
+
+        onDoubleClick={() => {
+          // e.stopPropagation();
+          if (task.title)
+            setIsEditing(true);
+        }}
+
+        onClick={() => {
+          if (!task.title)
+            handleAddTask();
+        }}
+
+        // DnD Stuff
+        ref={empty ? dummyRef : setNodeRef} {...attributes} {...listeners}
+        style={styleDnD}
+      >
+        <span className={`h-[10px] w-[10px] rounded-full flex-shrink-0 ${colors[task.priority]} ${task.title? "border-[1px] border-white/50" : ""}`} />
         {isEditing ?
           <input className="flex-grow outline-none bg-transparent border-none truncate" value={title}
             autoFocus
@@ -117,11 +134,11 @@ const TaskItem = ({task, listId/*, nestedRef*/, editableTaskId, setEditableTaskI
         }
         {task.title.trim() ?
           <span className="flex-shrink-0 hidden group-hover:flex justify-evenly gap-1 ">
-            <EllipsisHorizontalIcon className="w-5 h-5 hover:cursor-pointer"
+            <EllipsisHorizontalIcon className="w-4 h-4 hover:cursor-pointer"
               onClick={() => setSelectedTaskDetailsId(task.id)}
             />
             <XMarkIcon onClick={handleDelete} 
-              className="w-[18px] h-[18px] hover:cursor-pointer hover:text-red-400"/> 
+              className="w-4 h-4 hover:cursor-pointer hover:text-red-400"/> 
           </span>
           : null
         }

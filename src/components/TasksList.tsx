@@ -1,9 +1,10 @@
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
-import type { List } from "../types";
+import type { List, Task } from "../types";
 import TaskItem from "./TaskItem";
 import React, { useEffect, useRef, useState } from "react";
 import useStore from "../Store";
 import * as Menu from '@radix-ui/react-dropdown-menu'
+import { useDroppable } from "@dnd-kit/core";
 
 
 
@@ -11,12 +12,11 @@ type props = {
   list: List,
   isNewlyAdded: boolean,
   totalTasks: number,
-  // setFocusId: React.Dispatch<React.SetStateAction<number | null>>,
-  // focusId: number | null
 }
 
 
-const TaskList = ({list, isNewlyAdded, totalTasks/*, focusId, setFocusId*/}:props) => {
+const TaskList = ({list, isNewlyAdded, totalTasks}:props) => {
+
 
   const addTask = useStore(state => state.addTask)
   const deleteTask = useStore(state => state.deleteTask)
@@ -37,40 +37,21 @@ const TaskList = ({list, isNewlyAdded, totalTasks/*, focusId, setFocusId*/}:prop
     }
 
     if(lastTask && lastTask.title.trim()){
-      // const newId = addTask(list.id, '');
-      // taskToEdit = list.tasks.find(task => task.id === newId)
-      // addTask(list.id, '');
-      // setTriggerEffect(prev => prev + 1);
-      const newId = addTask(list.id, '');
+      const newId = addTask(list.id, '');2
       setTimeout(() => setEditableTaskId(newId), 10)
       setTriggerEffect(prev => prev + 1);
     }
   }, [totalTasks, lastTask])
 
-  // useEffect(() => {
-  //   if(lastTask && lastTask.title.trim()){
-  //     console.log("this is triggering")
-  //     const newId = addTask(list.id, '');
-  //     setEditableTaskId(newId);
-  //   }
-  // }, [lastTask])
-
 
 
   const [editableTaskId, setEditableTaskId] = useState<number | null>(null)
 
-  // if (lastTask && lastTask.title.trim()) {
-  //   const newId = addTask(list.id, '');
-  //   setEditableTaskId(newId);
-  // }
-  
+  const [isBeingEdited, setIsBeingEdited] = useState<boolean>(false); // List
+  const [title, setTitle] = useState<string>(list.title); // List
+  const [hasBeenFocused, setHasBeenFocused] = useState<boolean>(false) // List
 
-
-  const [isBeingEdited, setIsBeingEdited] = useState<boolean>(false);
-  const [title, setTitle] = useState<string>(list.title);
-  const [hasBeenFocused, setHasBeenFocused] = useState<boolean>(false)
-
-  const inputRef = useRef<HTMLInputElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null) // List Title
 
   useEffect(() => {
     if(!isNewlyAdded && list.tasks[0].id === -1){
@@ -108,14 +89,10 @@ const TaskList = ({list, isNewlyAdded, totalTasks/*, focusId, setFocusId*/}:prop
 
   const handleAddTask = () => {
     setEditableTaskId(taskToEdit?.id ?? null);
-    if(/*list.id === focusId && k*/list.title.trim())
+    if(list.title.trim())
       taskToEditInputRef.current?.focus();
-    // Make The Chosen Task Editable
-
   }
 
-  
-  
   
 
   const [triggerEffect, setTriggerEffect] = useState<number>(0);
@@ -128,7 +105,7 @@ const TaskList = ({list, isNewlyAdded, totalTasks/*, focusId, setFocusId*/}:prop
   
 
   const handleCompleteAll = () => {
-    updateList(list.id, {tasks: list.tasks.map(task => ({...task, completed: true}))});
+    updateList(list.id, {tasks: list.tasks.map(task => task.title.trim() ? ({...task, completed: true}) : task)});
   }
 
   const handleClearList = () => {
@@ -146,16 +123,14 @@ const TaskList = ({list, isNewlyAdded, totalTasks/*, focusId, setFocusId*/}:prop
     <Menu.Root>
       <Menu.Trigger asChild >
         <button className="opacity-0 absolute group-hover:opacity-100 right-0 top-2 pointer-events-none group-hover:pointer-events-auto outline-0">
-          <EllipsisVerticalIcon className="h-5 w-5  hover:cursor-pointer" strokeWidth={3} fill="#e0e0e0"
-            // onClick={() => setShowMenu(!showMenu)}
-          />
+          <EllipsisVerticalIcon className="h-5 w-5  hover:cursor-pointer" strokeWidth={3} fill="#e0e0e0"/>
         </button>
       </Menu.Trigger>
 
       <Menu.Content
         className="z-10 min-w-[160px] rounded-md bg-[#1F2937] p-1 shadow-lg border border-neutral-700 outline-0"
         align="start"
-        sideOffset={5} // optional: small offset from the trigger
+        sideOffset={5}
         side='bottom'
       >
         <Menu.Item className="px-3 py-2 text-sm text-gray-200 hover:bg-white/8 rounded cursor-pointer outline-0"
@@ -195,7 +170,35 @@ const TaskList = ({list, isNewlyAdded, totalTasks/*, focusId, setFocusId*/}:prop
     </Menu.Root>
   )
 
-  // const dummyRef = useRef(null); // Always called
+
+  const { setNodeRef } = useDroppable({
+    id: list.id,
+  })
+
+  const isEmptyTask = (task: Task) => {
+    if(task && (task.title || task.description || task.subtasks))
+      return false;
+    else return true;
+  }
+
+  useEffect(() => { // Put Empty Tasks at The End
+    // You Can Switch This for a .sort() Method Altho I Really Don't Want to
+    const length = list.tasks.length;
+    let emptyPointer = 0;
+    let filledPointer = 0;
+    const newList =  [...list.tasks];
+    while(emptyPointer < length - 1 && filledPointer < length){
+      if(!isEmptyTask(newList[emptyPointer]))
+        emptyPointer++;
+      else{
+        filledPointer = emptyPointer + 1;
+        while(isEmptyTask(newList[filledPointer]))
+          filledPointer++;
+      [newList[emptyPointer], newList[filledPointer]] = [newList[filledPointer], newList[emptyPointer]]; // Swap
+      }
+    }
+    updateList(list.id, {tasks: newList})
+  }, [list.tasks])
 
 
   return(
@@ -221,14 +224,12 @@ const TaskList = ({list, isNewlyAdded, totalTasks/*, focusId, setFocusId*/}:prop
         
       </div>
       <hr />
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1" ref={setNodeRef}>
         {list.tasks.map((task) => 
-        <div key={task.id} className="flex flex-col gap-1 ">
+        <div key={task.id} className="flex flex-col gap-1 text-sm">
           <TaskItem task={task} listId={list.id}  handleAddTask={handleAddTask}
-            editableTaskId={editableTaskId} setEditableTaskId={setEditableTaskId}  setTriggerEffect={setTriggerEffect} /*setEditingTaskId={setEditingTaskId}*/
-            // nestedRef={taskToEdit && task.id === taskToEdit.id ? taskToEditInputRef : dummyRef}
-          />
-          <hr className="opacity-30"/>
+            editableTaskId={editableTaskId} setEditableTaskId={setEditableTaskId}  setTriggerEffect={setTriggerEffect}/>
+          <hr className="opacity-30 h-[1px]"/>
         </div>)}
       </div>
     </div>
