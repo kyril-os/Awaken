@@ -101,10 +101,12 @@ const TaskItem = ({task, listId, editableTaskId, setEditableTaskId, handleAddTas
       }
       <div className={`group flex items-center gap-2 w-full px-2 ${task.completed ? "line-through" : ""} ${task.title.trim() ? "hover:bg-white/10" : ''}`}
 
-        onDoubleClick={() => {
-          // e.stopPropagation();
+        onDoubleClick={(e) => {
+          e.stopPropagation();
           if (task.title)
             setIsEditing(true);
+          // else
+          //   handleAddTask();
         }}
 
         onClick={() => {

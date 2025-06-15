@@ -180,26 +180,54 @@ const TaskList = ({list, isNewlyAdded, totalTasks}:props) => {
       return false;
     else return true;
   }
+  
+  
+  // DID NOT WORK! FROZED MY BROWSER
 
-  useEffect(() => { // Put Empty Tasks at The End
-    // You Can Switch This for a .sort() Method Altho I Really Don't Want to
-    const length = list.tasks.length;
-    let emptyPointer = 0;
-    let filledPointer = 0;
-    const newList =  [...list.tasks];
-    while(emptyPointer < length - 1 && filledPointer < length){
-      if(!isEmptyTask(newList[emptyPointer]))
-        emptyPointer++;
-      else{
-        filledPointer = emptyPointer + 1;
-        while(isEmptyTask(newList[filledPointer]))
-          filledPointer++;
-      [newList[emptyPointer], newList[filledPointer]] = [newList[filledPointer], newList[emptyPointer]]; // Swap
-      }
+  // useEffect(() => { // Put Empty Tasks at The End
+  //   // You Can Switch This for a .sort() Method Altho I Really Don't Want to
+  //   const length = list.tasks.length;
+  //   let emptyPointer = 0;
+  //   let filledPointer = 0;
+  //   const newList =  [...list.tasks];
+
+  //   let changed = false;
+  //   while(emptyPointer < length - 1 && filledPointer < length){
+  //     if(!isEmptyTask(newList[emptyPointer]))
+  //       emptyPointer++;
+  //     else{
+  //       if(emptyPointer > filledPointer)
+  //         filledPointer = emptyPointer + 1;
+  //       while(isEmptyTask(newList[filledPointer]))
+  //         filledPointer++;
+  //       if (filledPointer < length){
+  //         [newList[emptyPointer], newList[filledPointer]] = [newList[filledPointer], newList[emptyPointer]]; // Swap
+  //         emptyPointer++;
+  //         filledPointer++;
+  //         changed = true;
+  //       }
+  //     }
+  //   }
+  //   if(changed)
+  //     updateList(list.id, {tasks: newList})
+  // }, [list.tasks.length])
+
+  // REDO ON YOUR OWN LATER ON
+  useEffect(() => {
+    const newList = [...list.tasks];
+    const sorted = newList.sort((a, b) => {
+      const aEmpty = isEmptyTask(a);
+      const bEmpty = isEmptyTask(b);
+      return Number(aEmpty) - Number(bEmpty);
+    });
+  
+    // Optional: Avoid unnecessary state update
+    const changed = newList.some((task, i) => task.id !== list.tasks[i]?.id);
+    if (changed) {
+      updateList(list.id, { tasks: sorted });
     }
-    updateList(list.id, {tasks: newList})
-  }, [list.tasks])
-
+  }, [list.tasks]);
+  
 
   return(
     <div className="relative flex flex-col gap-2 justify-center"

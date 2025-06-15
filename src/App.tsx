@@ -1,4 +1,4 @@
-import { DndContext, type DragEndEvent } from "@dnd-kit/core";
+import { DndContext, KeyboardSensor, MouseSensor, PointerSensor, TouchSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import ListsContainer from "./components/ListsContainer";
 import SideBar from "./components/SideBar";
 import useStore from "./Store";
@@ -35,7 +35,7 @@ const App = () => {
   const handleDragEnd = (Event: DragEndEvent) => {
     const {active, over} = Event;
 
-    if(!over) return;
+    if(!over) return;2
 
     const taskId = active.id as number;
     const destinationListId = over.id as number;
@@ -50,17 +50,40 @@ const App = () => {
     const task = sourceList?.tasks.find(task => task.id === taskId);
 
     if(sourceContainer && sourceListId && sourceList !== destinationList){
-      updateList(destinationListId, {tasks: [task!, ...destinationList!.tasks]});
+      updateList(destinationListId, {tasks: [...destinationList!.tasks, task!]});
       updateList(sourceListId, {tasks: [...sourceList!.tasks.filter(task => task.id !== taskId)]});
     }
 
   }
 
+  const pointerSensor = useSensor(PointerSensor, {
+    activationConstraint: {
+      distance: 0.01
+    }
+  })
+  const mouseSensor = useSensor(MouseSensor)
+  const touchSensor = useSensor(TouchSensor)
+
+  const sensors = useSensors(
+    mouseSensor,
+    touchSensor,
+    pointerSensor
+  )
+
+  // const sensors = useSensors(
+  //   useSensor(PointerSensor, {
+  //     activationConstraint: {
+  //       distance: 5,
+  //       delay: 150,
+  //     }
+  //   })
+  // )
+
 
   return(
     <div className={`w-full h-full pl-15 pr-2 bg-[#1A1F29] text-[#E0E0E0] selection:bg-neutral-600 ${/*areDetailsVisible ? "" :*/ ""}`}>
       <SideBar />
-      <DndContext onDragEnd={handleDragEnd}>
+      <DndContext onDragEnd={handleDragEnd} sensors={sensors}>
         <ListsContainer container={dailyLists}/>
         <ListsContainer container={customLists}/>
       </DndContext>
