@@ -63,10 +63,12 @@ const App = () => {
   })
   const mouseSensor = useSensor(MouseSensor)
   const touchSensor = useSensor(TouchSensor)
+  // const keyboardSensor = useSensor(KeyboardSensor)
 
   const sensors = useSensors(
     mouseSensor,
     touchSensor,
+    // keyboardSensor,
     pointerSensor
   )
 
